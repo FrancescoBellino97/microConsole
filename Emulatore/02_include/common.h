@@ -1,4 +1,15 @@
-#pragma once
+/**
+ ******************************************************************************
+ * @file    common.h
+ * @author  Bellino Francesco
+ * @brief   Common header file.
+ *
+ *
+ ******************************************************************************
+ */
+
+#ifndef COMMON_H_
+#define COMMON_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -17,3 +28,5 @@ typedef uint64_t u64;
 #define BETWEEN(a, b, c) ((a >= b) && (a <= c))
 
 void delay(u32 ms);
+
+#endif

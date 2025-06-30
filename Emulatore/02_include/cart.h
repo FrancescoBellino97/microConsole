@@ -1,4 +1,15 @@
-#pragma once
+/**
+ ******************************************************************************
+ * @file    cart.h
+ * @author  Bellino Francesco
+ * @brief   Cart header file.
+ *
+ *
+ ******************************************************************************
+ */
+
+#ifndef CART_H_
+#define CART_H_
 
 #include <common.h>
 
@@ -20,3 +31,5 @@ typedef struct {
 } rom_header;
 
 bool cart_load(char *cart);
+
+#endif
