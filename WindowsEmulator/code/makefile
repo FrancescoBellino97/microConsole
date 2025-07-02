@@ -35,6 +35,10 @@ LIB_DIR			:=	03_lib
 BUILD_DIR		:=	05_build
 BUILD_SUPP_DIR	:=	$(BUILD_DIR)/
 
+#		DLL PATHS
+SDL_PATH		:=	04_sdl\sdl2\lib\x64
+SDL_TTF_PATH	:=	04_sdl\sdl2_ttf\lib\x64
+
 #		FILES
 OBJS			:=	$(BUILD_SUPP_DIR)/main.o \
 					$(BUILD_SUPP_DIR)/bus.o \
@@ -43,7 +47,9 @@ OBJS			:=	$(BUILD_SUPP_DIR)/main.o \
 					$(BUILD_SUPP_DIR)/emu.o \
 					$(BUILD_SUPP_DIR)/ppu.o \
 					$(BUILD_SUPP_DIR)/timer.o
-INCS			:=	-I$(INC_DIR)
+INCS			:=	-I$(INC_DIR) \
+					-I04_sdl/sdl2/include/SDL2 \
+					-I04_sdl/sdl2_ttf/include/SDL2
 					
 #		DEPENDENCIES
 DEPS			:=	$(OBJS:.o=.d)
@@ -52,18 +58,23 @@ DEPS			:=	$(OBJS:.o=.d)
 	
 #		COMPILER OPTIONS
 CC				:=	gcc
-CFLAGS			:=
+CFLAGS			:=	
 CPPFLAGS		:=	$(INCS)
 DEPFLAGS		:=	-MMD -MP
+DLLFLAGS		:=	-lSDL2 -L$(SDL_PATH) -lSDL2_ttf -lfreetype-6 -L$(SDL_TTF_PATH)
 
 
 #		BUILD PREPARATION
 $(shell IF NOT EXIST "$(BUILD_SUPP_DIR)" MKDIR "$(BUILD_SUPP_DIR)")		#Create the build directory if not present
 
-
 #		TARGETS
 .PHONY: all cleanall run
-all: $(BUILD_DIR)/$(PROJECT_NAME)
+
+all: $(BUILD_DIR)/$(PROJECT_NAME).exe
+	copy $(SDL_PATH)\SDL2.dll $(BUILD_DIR) 
+	copy $(SDL_TTF_PATH)\SDL2_ttf.dll $(BUILD_DIR)
+	copy $(SDL_TTF_PATH)\libfreetype-6.dll $(BUILD_DIR)
+	
 
 cleanall:	#Delete directory recursively (/S) and without confirm (/Q)
 	IF EXIST "$(BUILD_DIR)" RMDIR /Q /S "$(BUILD_DIR)"
@@ -72,13 +83,13 @@ run:
 
 	
 #		BUILD PROCESS
-$(BUILD_DIR)/$(PROJECT_NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $^ -o $@
+$(BUILD_DIR)/$(PROJECT_NAME).exe: $(OBJS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $^ $(DLLFLAGS) -o $@
 
 #		MAIN
 $(BUILD_SUPP_DIR)/%.o: $(APP_DIR)/%.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(DLLFLAGS) -o $@
 
 #		LIB
 $(BUILD_SUPP_DIR)/%.o: $(LIB_DIR)/%.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(DLLFLAGS) -o $@
