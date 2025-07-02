@@ -1,3 +1,8 @@
-Emulatore/04_sdl/*
-Emulatore/05_build/*
-Emulatore/07_reference/*
+Reference/*
+WindowsEmulator/.metadata/*
+WindowsEmulator/code/.settings/*
+WindowsEmulator/code/04_sdl/*
+WindowsEmulator/code/05_build/*
+WindowsEmulator/code/06_roms/*
+WindowsEmulator/code/.cproject
+WindowsEmulator/code/.project

@@ -62,11 +62,14 @@ $(shell IF NOT EXIST "$(BUILD_SUPP_DIR)" MKDIR "$(BUILD_SUPP_DIR)")		#Create the
 
 
 #		TARGETS
-.PHONY: all cleanall
+.PHONY: all cleanall run
 all: $(BUILD_DIR)/$(PROJECT_NAME)
 
 cleanall:	#Delete directory recursively (/S) and without confirm (/Q)
 	IF EXIST "$(BUILD_DIR)" RMDIR /Q /S "$(BUILD_DIR)"
+
+run:
+
 	
 #		BUILD PROCESS
 $(BUILD_DIR)/$(PROJECT_NAME): $(OBJS)
