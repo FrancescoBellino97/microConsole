@@ -33,11 +33,8 @@ APP_DIR			:=	01_gbemu
 INC_DIR			:=	02_include
 LIB_DIR			:=	03_lib
 BUILD_DIR		:=	05_build
-BUILD_SUPP_DIR	:=	$(BUILD_DIR)/
+BUILD_SUPP_DIR	:=	$(BUILD_DIR)/code
 
-#		DLL PATHS
-SDL_PATH		:=	04_sdl\sdl2\lib\x64
-SDL_TTF_PATH	:=	04_sdl\sdl2_ttf\lib\x64
 
 #		FILES
 OBJS			:=	$(BUILD_SUPP_DIR)/main.o \
@@ -47,6 +44,11 @@ OBJS			:=	$(BUILD_SUPP_DIR)/main.o \
 					$(BUILD_SUPP_DIR)/emu.o \
 					$(BUILD_SUPP_DIR)/ppu.o \
 					$(BUILD_SUPP_DIR)/timer.o
+
+DLLS			:=	$(BUILD_DIR)\SDL2.dll \
+					$(BUILD_DIR)\SDL2_ttf.dll \
+					$(BUILD_DIR)\libfreetype-6.dll
+					
 INCS			:=	-I$(INC_DIR) \
 					-I04_sdl/sdl2/include/SDL2 \
 					-I04_sdl/sdl2_ttf/include/SDL2
@@ -61,35 +63,50 @@ CC				:=	gcc
 CFLAGS			:=	
 CPPFLAGS		:=	$(INCS)
 DEPFLAGS		:=	-MMD -MP
-DLLFLAGS		:=	-lSDL2 -L$(SDL_PATH) -lSDL2_ttf -lfreetype-6 -L$(SDL_TTF_PATH)
+DLLFLAGS		:=	-lSDL2 -lSDL2_ttf -lfreetype-6 -L$(BUILD_DIR)
 
+#		POST-BUILD OPTIONS
+OBJDUMP			:=	C:\msys64\ucrt64\bin\objdump
 
-#		BUILD PREPARATION
-$(shell IF NOT EXIST "$(BUILD_SUPP_DIR)" MKDIR "$(BUILD_SUPP_DIR)")		#Create the build directory if not present
 
 #		TARGETS
-.PHONY: all cleanall run
+.PHONY: all cleanall
 
-all: $(BUILD_DIR)/$(PROJECT_NAME).exe
+all: $(BUILD_DIR) $(DLLS) $(BUILD_DIR)/$(PROJECT_NAME).exe $(BUILD_DIR)/$(PROJECT_NAME).lst
 	
 
 cleanall:	#Delete directory recursively (/S) and without confirm (/Q)
-	IF EXIST "$(BUILD_DIR)" RMDIR /Q /S "$(BUILD_DIR)"
-
-run:
+	if exist "$(BUILD_DIR)" rmdir /Q /S "$(BUILD_DIR)"
 
 	
 #		BUILD PROCESS
 $(BUILD_DIR)/$(PROJECT_NAME).exe: $(OBJS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $^ $(DLLFLAGS) -o $@
-	if not exist $(BUILD_DIR)\SDL2.dll copy $(SDL_PATH)\SDL2.dll $(BUILD_DIR) 
-	if not exist $(BUILD_DIR)\SDL2_ttf.dll copy $(SDL_TTF_PATH)\SDL2_ttf.dll $(BUILD_DIR)
-	if not exist $(BUILD_DIR)\libfreetype-6.dll copy $(SDL_TTF_PATH)\libfreetype-6.dll $(BUILD_DIR)
+	
+$(BUILD_DIR)/$(PROJECT_NAME).lst: $(BUILD_DIR)/$(PROJECT_NAME).exe
+	$(OBJDUMP) -D $^ > $@
+
 
 #		MAIN
-$(BUILD_SUPP_DIR)/%.o: $(APP_DIR)/%.c
+$(BUILD_SUPP_DIR)/%.o: $(APP_DIR)/%.c 
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(DLLFLAGS) -o $@
 
 #		LIB
-$(BUILD_SUPP_DIR)/%.o: $(LIB_DIR)/%.c
+$(BUILD_SUPP_DIR)/%.o: $(LIB_DIR)/%.c 
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(DLLFLAGS) -o $@
+
+
+#		BUILD DIRECTORY CREATION
+$(BUILD_DIR):
+	mkdir "$(BUILD_SUPP_DIR)"
+
+
+#		DLL TRASFER TO BUILD DIRECTORY
+$(BUILD_DIR)\SDL2.dll:
+	copy $(SDL_PATH)\SDL2.dll $(BUILD_DIR)
+	
+$(BUILD_DIR)\SDL2_ttf.dll:
+	copy $(SDL_TTF_PATH)\SDL2_ttf.dll $(BUILD_DIR)
+	
+$(BUILD_DIR)\libfreetype-6.dll:
+	copy $(SDL_TTF_PATH)\libfreetype-6.dll $(BUILD_DIR)
