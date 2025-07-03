@@ -71,9 +71,6 @@ $(shell IF NOT EXIST "$(BUILD_SUPP_DIR)" MKDIR "$(BUILD_SUPP_DIR)")		#Create the
 .PHONY: all cleanall run
 
 all: $(BUILD_DIR)/$(PROJECT_NAME).exe
-	copy $(SDL_PATH)\SDL2.dll $(BUILD_DIR) 
-	copy $(SDL_TTF_PATH)\SDL2_ttf.dll $(BUILD_DIR)
-	copy $(SDL_TTF_PATH)\libfreetype-6.dll $(BUILD_DIR)
 	
 
 cleanall:	#Delete directory recursively (/S) and without confirm (/Q)
@@ -85,6 +82,9 @@ run:
 #		BUILD PROCESS
 $(BUILD_DIR)/$(PROJECT_NAME).exe: $(OBJS)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $^ $(DLLFLAGS) -o $@
+	if not exist $(BUILD_DIR)\SDL2.dll copy $(SDL_PATH)\SDL2.dll $(BUILD_DIR) 
+	if not exist $(BUILD_DIR)\SDL2_ttf.dll copy $(SDL_TTF_PATH)\SDL2_ttf.dll $(BUILD_DIR)
+	if not exist $(BUILD_DIR)\libfreetype-6.dll copy $(SDL_TTF_PATH)\libfreetype-6.dll $(BUILD_DIR)
 
 #		MAIN
 $(BUILD_SUPP_DIR)/%.o: $(APP_DIR)/%.c

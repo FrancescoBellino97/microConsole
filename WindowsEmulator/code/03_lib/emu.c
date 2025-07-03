@@ -32,7 +32,7 @@ emu_context *emu_get_context() {
 }
 
 void delay(u32 ms) {
-//    SDL_Delay(ms);
+    SDL_Delay(ms);
 }
 int emu_run(int argc, char **argv) {
     if (argc < 2) {
