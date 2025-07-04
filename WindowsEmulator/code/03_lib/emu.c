@@ -38,12 +38,12 @@ void delay(u32 ms) {
 int emu_run(int argc, char **argv) {
     if (argc < 2) {
         printf("Usage: emu <rom_file>\n");
-        return -1;
+        return ERR_MISSING_ROM;
     }
 
     if (!cart_load(argv[1])) {
         printf("Failed to load ROM file: %s\n", argv[1]);
-        return -2;
+        return ERR_LOADING_ROM;
     }
 
     printf("Cart loaded..\n");
@@ -67,13 +67,13 @@ int emu_run(int argc, char **argv) {
 
         if (!cpu_step()) {
             printf("CPU Stopped\n");
-            return -3;
+            return ERR_CPU_STOPPED;
         }
 
         ctx.ticks++;
     }
 
-    return 0;
+    return NO_ERROR;
 }
 
 void emu_cycles(int cpu_cycles) {

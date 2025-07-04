@@ -14,7 +14,7 @@
 
 static void proc_none(cpu_context *ctx) {
     printf("INVALID INSTRUCTION!\n");
-    exit(-7);
+    exit(ERR_INVALID_INSTRUCTION);
 }
 
 static void proc_nop(cpu_context *ctx) {

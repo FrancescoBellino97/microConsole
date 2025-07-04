@@ -60,7 +60,7 @@ static void fetch_data() {
 
         default:
             printf("Unknown Addressing Mode! %d (%02X)\n", ctx.cur_inst->mode, ctx.cur_opcode);
-            exit(-7);
+            exit(ERR_UNKNOWM_ADDRESS_MODE);
             return;
     }
 }
@@ -89,7 +89,7 @@ bool cpu_step() {
 
         if (ctx.cur_inst == NULL) {
             printf("Unknown Instruction! %02X\n", ctx.cur_opcode);
-            exit(-7);
+            exit(ERR_UNKNOWN_INSTRUCTION);
         }
 
         execute();
