@@ -1,18 +1,9 @@
-/**
- ******************************************************************************
- * @file    emu.c
- * @author  Bellino Francesco
- * @brief   Emu source code.
- *
- ******************************************************************************
- */
-
 #include <stdio.h>
 #include <emu.h>
 #include <cart.h>
 #include <cpu.h>
-#include <SDL.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
 /* 
   Emu components:
@@ -34,6 +25,7 @@ emu_context *emu_get_context() {
 void delay(u32 ms) {
     SDL_Delay(ms);
 }
+
 int emu_run(int argc, char **argv) {
     if (argc < 2) {
         printf("Usage: emu <rom_file>\n");
@@ -73,4 +65,8 @@ int emu_run(int argc, char **argv) {
     }
 
     return 0;
+}
+
+void emu_cycles(int cpu_cycles) {
+    //TODO...
 }

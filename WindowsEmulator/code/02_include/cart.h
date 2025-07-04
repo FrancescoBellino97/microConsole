@@ -1,15 +1,4 @@
-/**
- ******************************************************************************
- * @file    cart.h
- * @author  Bellino Francesco
- * @brief   Cart header file.
- *
- *
- ******************************************************************************
- */
-
-#ifndef CART_H_
-#define CART_H_
+#pragma once
 
 #include <common.h>
 
@@ -32,4 +21,6 @@ typedef struct {
 
 bool cart_load(char *cart);
 
-#endif
+u8 cart_read(u16 address);
+void cart_write(u16 address, u8 value);
+

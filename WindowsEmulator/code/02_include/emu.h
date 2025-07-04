@@ -1,15 +1,4 @@
-/**
- ******************************************************************************
- * @file    emu.h
- * @author  Bellino Francesco
- * @brief   Emu header file.
- *
- *
- ******************************************************************************
- */
-
-#ifndef EMU_H_
-#define EMU_H_
+#pragma once
 
 #include <common.h>
 
@@ -23,4 +12,4 @@ int emu_run(int argc, char **argv);
 
 emu_context *emu_get_context();
 
-#endif
+void emu_cycles(int cpu_cycles);
