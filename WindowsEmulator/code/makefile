@@ -42,8 +42,11 @@ SDL_TTF_PATH    :=    04_sdl\sdl2_ttf\lib\x64
 OBJS			:=	$(BUILD_SUPP_DIR)/main.o \
 					$(BUILD_SUPP_DIR)/bus.o \
 					$(BUILD_SUPP_DIR)/cart.o \
+					$(BUILD_SUPP_DIR)/cpu_proc.o \
+					$(BUILD_SUPP_DIR)/cpu_util.o \
 					$(BUILD_SUPP_DIR)/cpu.o \
 					$(BUILD_SUPP_DIR)/emu.o \
+					$(BUILD_SUPP_DIR)/instructions.o \
 					$(BUILD_SUPP_DIR)/ppu.o \
 					$(BUILD_SUPP_DIR)/timer.o
 
