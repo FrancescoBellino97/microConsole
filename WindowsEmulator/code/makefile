@@ -62,7 +62,7 @@ DEPS			:=	$(OBJS:.o=.d)
 	
 #		COMPILER OPTIONS
 CC				:=	gcc
-CFLAGS			:=	
+CFLAGS			:=	-Wall
 CPPFLAGS		:=	$(INCS)
 DEPFLAGS		:=	-MMD -MP
 DLLFLAGS		:=	-lSDL2 -lSDL2_ttf -lfreetype-6 -L$(BUILD_DIR)
