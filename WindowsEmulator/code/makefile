@@ -35,6 +35,8 @@ LIB_DIR			:=	03_lib
 BUILD_DIR		:=	05_build
 BUILD_SUPP_DIR	:=	$(BUILD_DIR)/code
 
+SDL_PATH        :=    04_sdl\sdl2\lib\x64
+SDL_TTF_PATH    :=    04_sdl\sdl2_ttf\lib\x64
 
 #		FILES
 OBJS			:=	$(BUILD_SUPP_DIR)/main.o \
@@ -64,6 +66,7 @@ CFLAGS			:=
 CPPFLAGS		:=	$(INCS)
 DEPFLAGS		:=	-MMD -MP
 DLLFLAGS		:=	-lSDL2 -lSDL2_ttf -lfreetype-6 -L$(BUILD_DIR)
+MEM_USAGE		:=	memoryUsage.exe
 
 #		POST-BUILD OPTIONS
 OBJDUMP			:=	C:\msys64\ucrt64\bin\objdump
@@ -72,20 +75,27 @@ OBJDUMP			:=	C:\msys64\ucrt64\bin\objdump
 #		TARGETS
 .PHONY: all cleanall
 
-all: $(BUILD_DIR) $(DLLS) $(BUILD_DIR)/$(PROJECT_NAME).exe $(BUILD_DIR)/$(PROJECT_NAME).lst
+all: $(BUILD_DIR) $(DLLS) $(BUILD_DIR)/$(PROJECT_NAME).exe $(BUILD_DIR)/$(PROJECT_NAME).lst $(BUILD_DIR)/$(PROJECT_NAME).hdr $(BUILD_DIR)/memory_usage.txt
 	
 
 cleanall:	#Delete directory recursively (/S) and without confirm (/Q)
 	if exist "$(BUILD_DIR)" rmdir /Q /S "$(BUILD_DIR)"
 
-	
+
 #		BUILD PROCESS
 $(BUILD_DIR)/$(PROJECT_NAME).exe: $(OBJS)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $^ $(DLLFLAGS) -o $@
+	$(CC) $(CFLAGS) $(CPPFLAGS) $^ $(DLLFLAGS) -o $@ -Wl,-Map="$(BUILD_DIR)/$(PROJECT_NAME).map"
 	
 $(BUILD_DIR)/$(PROJECT_NAME).lst: $(BUILD_DIR)/$(PROJECT_NAME).exe
-	$(OBJDUMP) -D $^ > $@
+	$(OBJDUMP) -S $^ > $@
 
+$(BUILD_DIR)/$(PROJECT_NAME).hdr: $(BUILD_DIR)/$(PROJECT_NAME).exe
+	$(OBJDUMP) -h $^ > $@
+
+
+$(BUILD_DIR)/memory_usage.txt: $(BUILD_DIR)/$(PROJECT_NAME).hdr
+	$(MEM_USAGE) $^ > $@
+	$(MEM_USAGE) $^
 
 #		MAIN
 $(BUILD_SUPP_DIR)/%.o: $(APP_DIR)/%.c 
