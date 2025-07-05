@@ -14,46 +14,43 @@
 #include <common.h>
 #include <instructions.h>
 
+#define	BIT_Z	7
+#define BIT_C	4
+
 typedef struct {
-    u8 a;
-    u8 f;
-    u8 b;
-    u8 c;
-    u8 d;
-    u8 e;
-    u8 h;
-    u8 l;
-    u16 pc;
-    u16 sp;
+    u8 a;	/* Register A */
+    u8 f;	/* Register F */
+    u8 b;	/* Register B */
+    u8 c;	/* Register C */
+    u8 d;	/* Register D */
+    u8 e;	/* Register E */
+    u8 h;	/* Register H */
+    u8 l;	/* Register L */
+    u16 pc;	/* Program Counter */
+    u16 sp;	/* Stack Pointer */
 } cpu_registers;
 
 typedef struct {
-    cpu_registers regs;
+    cpu_registers regs;			/* Registers of CPU */
 
-    //current fetch...
-    u16 fetched_data;
-    u16 mem_dest;
-    bool dest_is_mem;
-    u8 cur_opcode;
-    instruction *cur_inst;
+    /* Fetch data */
+    u16 fetched_data;			/* Data fetched based on the Instruction */
+    u16 mem_dest;				/* Memory Destination ? */
+    bool dest_is_mem;			/* Flag for Memory Destination ? */
+    u8 cur_opcode;				/* Operation Code read from Cartridge */
+    instruction *cur_inst;		/* Instruction decoded by Op Code */
 
-    bool halted;
-    bool stepping;
+    /* CPU state */
+    bool halted;				/* Flag for Halted CPU */
+    bool stepping;				/* Flag for Running CPU */
 
-    bool int_master_enabled;
+    bool int_master_enabled;	/* Flag for Interrupts enabled? */
     
 } cpu_context;
+
 
 void cpu_init();
 bool cpu_step();
 
-typedef void (*IN_PROC)(cpu_context *);
-
-IN_PROC inst_get_processor(in_type type);
-
-#define CPU_FLAG_Z BIT(ctx->regs.f, 7)
-#define CPU_FLAG_C BIT(ctx->regs.f, 4)
-
-u16 cpu_read_reg(reg_type rt);
 
 #endif

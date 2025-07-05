@@ -9,10 +9,12 @@
 
 #include <timer.h>
 
-void timer_init() {
+void timer_init()
+{
 
 }
 
-void timer_tick() {
+void timer_tick()
+{
 
 }

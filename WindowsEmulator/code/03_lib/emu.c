@@ -25,57 +25,108 @@
 
 */
 
-static emu_context ctx;
+static void delay();
 
-emu_context *emu_get_context() {
-    return &ctx;
-}
+static emu_context emu_ctx;
 
-void delay(u32 ms) {
-    SDL_Delay(ms);
-}
-
+/**
+  * @brief  Run the emulation procedure
+  * @param  argc:	number of arguments passed
+  * 		**argv:	pointer to the arguments passed
+  * @retval FALSE:	an error occurred
+  * 		TRUE:	no errors
+  */
 int emu_run(int argc, char **argv) {
-    if (argc < 2) {
+	/* Check if there is at least one argument */
+    if (argc < 2)
+    {
+#if DEBUG==true
         printf("Usage: emu <rom_file>\n");
+#endif
         return ERR_MISSING_ROM;
     }
 
-    if (!cart_load(argv[1])) {
+    /* Load the cartridge */
+    if (!cart_load(argv[1]))
+    {
+#if DEBUG==true
         printf("Failed to load ROM file: %s\n", argv[1]);
+#endif
         return ERR_LOADING_ROM;
     }
 
+#if DEBUG==true
     printf("Cart loaded..\n");
+#endif
 
+    /* SDL init */
     SDL_Init(SDL_INIT_VIDEO);
+#if DEBUG==true
     printf("SDL INIT\n");
-    TTF_Init();
-    printf("TTF INIT\n");
+#endif
 
+    /* SDL TTF init */
+    TTF_Init();
+#if DEBUG==true
+    printf("TTF INIT\n");
+#endif
+
+    /* CPU init */
     cpu_init();
     
-    ctx.running = true;
-    ctx.paused = false;
-    ctx.ticks = 0;
+    /* Initialize EMU Context variable */
+    emu_ctx.running = true;
+    emu_ctx.paused = false;
+    emu_ctx.ticks = 0;
 
-    while(ctx.running) {
-        if (ctx.paused) {
+    /* Infinite Loop */
+    while(emu_ctx.running)
+    {
+        if (emu_ctx.paused)
+        {
             delay(10);
             continue;
         }
 
-        if (!cpu_step()) {
+        /* CPU Elaboration */
+        if (!cpu_step())
+        {
             printf("CPU Stopped\n");
             return ERR_CPU_STOPPED;
         }
 
-        ctx.ticks++;
+        emu_ctx.ticks++;
     }
 
     return NO_ERROR;
 }
 
-void emu_cycles(int cpu_cycles) {
+/**
+  * @brief  Get the emulation context
+  * @param  None
+  * @retval *emu_ctx:	emulation context variable
+  */
+emu_context *emu_get_context() {
+    return &emu_ctx;
+}
+
+/**
+  * @brief  Todo
+  * @param  None
+  * @retval None
+  */
+void emu_cycles(int cpu_cycles)
+{
     //TODO...
 }
+
+/**
+  * @brief  Wait a delay in ms
+  * @param  ms:		value in ms to wait
+  * @retval None
+  */
+static void delay(u32 ms)
+{
+    SDL_Delay(ms);
+}
+

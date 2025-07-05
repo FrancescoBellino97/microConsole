@@ -7,10 +7,11 @@
  ******************************************************************************
  */
 
- #include <instructions.h>
+#include <instructions.h>
 #include <cpu.h>
 
-instruction instructions[0x100] = {
+instruction instructions[0x100] =
+{
     [0x00] = {IN_NOP, AM_IMP},
 
     [0x05] = {IN_DEC, AM_R, RT_B},
@@ -24,11 +25,13 @@ instruction instructions[0x100] = {
     [0xF3] = {IN_DI}
 };
 
-instruction *instruction_by_opcode(u8 opcode) {
+instruction *instruction_by_opcode(u8 opcode)
+{
     return &instructions[opcode];
 }
 
-char *inst_lookup[] = {
+char *inst_lookup[] =
+{
     "<NONE>",
     "NOP",
     "LD",
@@ -79,6 +82,7 @@ char *inst_lookup[] = {
     "IN_SET"
 };
 
-char *inst_name(in_type t) {
+char *inst_name(in_type t)
+{
     return inst_lookup[t];
 }

@@ -1,20 +1,17 @@
 /**
  ******************************************************************************
- * @file    ppu.c
+ * @file    cpu_proc.h
  * @author  Bellino Francesco
- * @brief   PPU source code.
+ * @brief   CPU process header file.
+ *
  *
  ******************************************************************************
  */
 
-#include <ppu.h>
+#ifndef CPU_PROC_H_
+#define CPU_PROC_H_
 
-void ppu_init()
-{
+typedef void (*IN_PROC)(cpu_context *);
+IN_PROC inst_get_processor(in_type type);
 
-}
-
-void ppu_tick()
-{
-
-}
+#endif

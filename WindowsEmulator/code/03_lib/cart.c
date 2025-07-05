@@ -9,16 +9,25 @@
 
 #include <cart.h>
 
-typedef struct {
+static const char *cart_lic_name();
+static const char *cart_type_name();
+
+#if DEBUG==true
+static void print_cart_info();
+#endif
+
+typedef struct
+{
     char filename[1024];
     u32 rom_size;
     u8 *rom_data;
     rom_header *header;
 } cart_context;
 
-static cart_context ctx;
+static cart_context cart_ctx;
 
-static const char *ROM_TYPES[] = {
+static const char *ROM_TYPES[] =
+{
     "ROM ONLY",
     "MBC1",
     "MBC1+RAM",
@@ -56,7 +65,8 @@ static const char *ROM_TYPES[] = {
     "MBC7+SENSOR+RUMBLE+RAM+BATTERY",
 };
 
-static const char *LIC_CODE[0xA5] = {
+static const char *LIC_CODE[0xA5] =
+{
     [0x00] = "None",
     [0x01] = "Nintendo R&D1",
     [0x08] = "Capcom",
@@ -120,72 +130,138 @@ static const char *LIC_CODE[0xA5] = {
     [0xA4] = "Konami (Yu-Gi-Oh!)"
 };
 
-const char *cart_lic_name() {
-    if (ctx.header->new_lic_code <= 0xA4) {
-        return LIC_CODE[ctx.header->lic_code];
-    }
 
-    return "UNKNOWN";
-}
 
-const char *cart_type_name() {
-    if (ctx.header->type <= 0x22) {
-        return ROM_TYPES[ctx.header->type];
-    }
+/**
+  * @brief  Load the Cartridge in memory and print some informations
+  * @param  cart:	Cartridge filename with path
+  * @retval bool:	true if no error, false otherwise
+  */
+bool cart_load(char *cart)
+{
+	/* Save filename in Cart context variable */
+    snprintf(cart_ctx.filename, sizeof(cart_ctx.filename), "%s", cart);
 
-    return "UNKNOWN";
-}
-
-bool cart_load(char *cart) {
-    snprintf(ctx.filename, sizeof(ctx.filename), "%s", cart);
-
+    /* Open Cartridge file */
     FILE *fp = fopen(cart, "r");
 
-    if (!fp) {
+    if (!fp)
+    {
+#if DEBUG==true
         printf("Failed to open: %s\n", cart);
+#endif
         return false;
     }
 
-    printf("Opened: %s\n", ctx.filename);
+#if DEBUG==true
+    printf("Opened: %s\n", cart_ctx.filename);
+#endif
 
+    /* Go to EOF to get the Cartridge size */
     fseek(fp, 0, SEEK_END);
-    ctx.rom_size = ftell(fp);
+    cart_ctx.rom_size = ftell(fp);
 
+    /* Restart File Pointer */
     rewind(fp);
 
-    ctx.rom_data = malloc(ctx.rom_size);
-    fread(ctx.rom_data, ctx.rom_size, 1, fp);
+    /* Allocate dynamically a variable for Cartridge content */
+    cart_ctx.rom_data = malloc(cart_ctx.rom_size);
+    fread(cart_ctx.rom_data, cart_ctx.rom_size, 1, fp);
+
+    /* Close Cartridge file */
     fclose(fp);
 
-    ctx.header = (rom_header *)(ctx.rom_data + 0x100);
-    ctx.header->title[15] = 0;
+    /* Skip to 0x100 (start of Cartridge Header) */
+    cart_ctx.header = (rom_header *)(cart_ctx.rom_data + 0x100);
+    cart_ctx.header->title[15] = 0;
 
-    printf("Cartridge Loaded:\n");
-    printf("\t Title    : %s\n", ctx.header->title);
-    printf("\t Type     : %2.2X (%s)\n", ctx.header->type, cart_type_name());
-    printf("\t ROM Size : %d KB\n", 32 << ctx.header->rom_size);
-    printf("\t RAM Size : %2.2X\n", ctx.header->ram_size);
-    printf("\t LIC Code : %2.2X (%s)\n", ctx.header->lic_code, cart_lic_name());
-    printf("\t ROM Vers : %2.2X\n", ctx.header->version);
+#if DEBUG==true
+    print_cart_info();
+#endif
 
+    /* Checksum algorithm */
     u16 x = 0;
-    for (u16 i=0x0134; i<=0x014C; i++) {
-        x = x - ctx.rom_data[i] - 1;
+    for (u16 i=0x0134; i<=0x014C; i++)
+    {
+        x = x - cart_ctx.rom_data[i] - 1;
     }
 
-    printf("\t Checksum : %2.2X (%s)\n", ctx.header->checksum, (x & 0xFF) ? "PASSED" : "FAILED");
+#if DEBUG==true
+    printf("\t Checksum : %2.2X (%s)\n", cart_ctx.header->checksum, (x & 0xFF) ? "PASSED" : "FAILED");
+#endif
 
     return true;
 }
 
-u8 cart_read(u16 address) {
-    //for now just ROM ONLY type supported...
-
-    return ctx.rom_data[address];
+/**
+  * @brief  Read data from Cartridge at a specific address
+  * @param  address:	address to read
+  * @retval uint8_t:	data read
+  */
+u8 cart_read(u16 address)
+{
+    /* Read and return the address */
+    return cart_ctx.rom_data[address];
 }
 
-void cart_write(u16 address, u8 value) {
-    //for now, ROM ONLY...
-
+/**
+  * @brief  Write data from Cartridge at a specific address (NOT IMPLEMENTED)
+  * @param  address:	address to write
+  * @retval None
+  */
+void cart_write(u16 address, u8 value)
+{
+    /* Write the address (NOT IMPLEMENTED) */
     NO_IMPL
 }
+
+/**
+  * @brief  Get the license name from the new license code
+  * @param  None
+  * @retval char*:	license name
+  */
+static const char *cart_lic_name()
+{
+	/* Convert the Code read to the New License Code */
+    if (cart_ctx.header->new_lic_code <= 0xA4) {
+        return LIC_CODE[cart_ctx.header->lic_code];
+    }
+
+    /* Code read unknown */
+    return "UNKNOWN";
+}
+
+/**
+  * @brief  Get the cart type
+  * @param  None
+  * @retval char*:	cart type
+  */
+static const char *cart_type_name()
+{
+	/* Convert the type read to the Cartridge Type */
+    if (cart_ctx.header->type <= 0x22)
+    {
+        return ROM_TYPES[cart_ctx.header->type];
+    }
+
+    /* Code read unknown */
+    return "UNKNOWN";
+}
+
+#if DEBUG==true
+/**
+  * @brief  Print informations about the Cartridge loaded
+  * @param  None
+  * @retval None
+  */
+static void print_cart_info()
+{
+	printf("Cartridge Loaded:\n");
+	printf("\t Title    : %s\n", cart_ctx.header->title);
+	printf("\t Type     : %2.2X (%s)\n", cart_ctx.header->type, cart_type_name());
+	printf("\t ROM Size : %d KB\n", 32 << cart_ctx.header->rom_size);
+	printf("\t RAM Size : %2.2X\n", cart_ctx.header->ram_size);
+	printf("\t LIC Code : %2.2X (%s)\n", cart_ctx.header->lic_code, cart_lic_name());
+	printf("\t ROM Vers : %2.2X\n", cart_ctx.header->version);
+}
+#endif
