@@ -12,11 +12,21 @@
 
 extern cpu_context cpu_ctx;
 
+/**
+  * @brief  Reverse the LSB Byte with the MSB Byte
+  * @param  n:		2 Byte data to reverse
+  * @retval u16:	2 Byte data reversed
+  */
 u16 reverse(u16 n)
 {
     return ((n & 0xFF00) >> 8) | ((n & 0x00FF) << 8);
 }
 
+/**
+  * @brief  Read and return the content of a register
+  * @param  rt:		register to read
+  * @retval u16:	content of the register (or 0 if register is unknown)
+  */
 u16 cpu_read_reg(reg_type rt)
 {
     switch(rt)
@@ -41,6 +51,15 @@ u16 cpu_read_reg(reg_type rt)
     }
 }
 
+/**
+  * @brief  Set the value in flag register
+  * @param  ctx:	context of the CPU
+  * 		z:		zero flag value to set (-1 means to keep the value)
+  * 		n:		subtraction flag value to set (-1 means to keep the value)
+  * 		h:		half carry flag value to set (-1 means to keep the value)
+  * 		c:		carry flag value to set (-1 means to keep the value)
+  * @retval None
+  */
 void cpu_set_flags(cpu_context *ctx, char z, char n, char h, char c)
 {
     if (z != -1) {
@@ -60,6 +79,11 @@ void cpu_set_flags(cpu_context *ctx, char z, char n, char h, char c)
     }
 }
 
+/**
+  * @brief  Check the condition from CPU context and return true or false
+  * @param  ctx:	context of the CPU
+  * @retval bool:	true or false depending if the flag is set
+  */
 bool check_cond(cpu_context *ctx)
 {
     bool z = BIT(ctx->regs.f, BIT_Z);

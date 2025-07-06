@@ -10,8 +10,7 @@
 #include <bus.h>
 #include <cart.h>
 
-/*
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                     CARTRIDGE MEMORY MAP                      *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * 0x0000 - 0x3FFF : ROM Bank 0									 *
@@ -27,8 +26,8 @@
  * 0xFEA0 - 0xFEFF : Reserved - Unusable						 *
  * 0xFF00 - 0xFF7F : I/O Registers								 *
  * 0xFF80 - 0xFFFE : Zero Page									 *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 
 /**
   * @brief  Read data from cart at a specific address

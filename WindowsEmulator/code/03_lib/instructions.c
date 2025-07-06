@@ -10,6 +10,7 @@
 #include <instructions.h>
 #include <cpu.h>
 
+/* Look-Up table from OpCode to Instruction structure */
 instruction instructions[0x100] =
 {
     [0x00] = {IN_NOP, AM_IMP},
@@ -25,11 +26,18 @@ instruction instructions[0x100] =
     [0xF3] = {IN_DI}
 };
 
+/**
+  * @brief  Convert the OpCode to an instruction
+  * @param  opcode:			operation code read
+  * @retval instruction:	instruction decoded
+  */
 instruction *instruction_by_opcode(u8 opcode)
 {
     return &instructions[opcode];
 }
 
+#if DEBUG==true
+/* Look-Up table to convert the type to string (for debug)  */
 char *inst_lookup[] =
 {
     "<NONE>",
@@ -81,8 +89,16 @@ char *inst_lookup[] =
     "IN_RES", 
     "IN_SET"
 };
+#endif
 
+#if DEBUG==true
+/**
+  * @brief  Convert the instruction type to a string (for debug)
+  * @param  t:		instruction type
+  * @retval char*:	instruction string name
+  */
 char *inst_name(in_type t)
 {
     return inst_lookup[t];
 }
+#endif

@@ -18,11 +18,10 @@
   Emu components:
 
   |Cart|
-  |CPU|
+  |CPU| |CPU util| |CPU process|
   |Address Bus|
   |PPU|
   |Timer|
-
 */
 
 static void delay();

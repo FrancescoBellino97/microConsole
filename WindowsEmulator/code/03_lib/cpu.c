@@ -187,10 +187,12 @@ static void print_header()
   */
 static void print_instruction(u16 old_pc)
 {
-	printf("%04X:\t%-7s\t(%02X   %02X   %02X)\t%02X\t%02X\t%02X\t%02X\t%02X\t%02X\t%01X%01X\n",
+	printf(
+			"%04X:\t%-7s\t(%02X   %02X   %02X)\t%02X\t%02X\t%02X\t%02X\t%02X\t%02X\t%01X%01X\n",
 			old_pc, inst_name(cpu_ctx.cur_inst->type),
 			cpu_ctx.cur_opcode, bus_read(old_pc + 1), bus_read(old_pc + 2),
 			cpu_ctx.regs.a, cpu_ctx.regs.b, cpu_ctx.regs.c, cpu_ctx.regs.d, cpu_ctx.regs.h, cpu_ctx.regs.l,
-			BIT(cpu_ctx.regs.f, BIT_Z), BIT(cpu_ctx.regs.f, BIT_C));
+			BIT(cpu_ctx.regs.f, BIT_Z), BIT(cpu_ctx.regs.f, BIT_C)
+			);
 }
 #endif
