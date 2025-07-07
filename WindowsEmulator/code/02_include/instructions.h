@@ -17,24 +17,24 @@ typedef enum {
     AM_IMP,		/* Addressing Mode Implied (not needed) */
     AM_R_D16,	/* Addressing Mode 16b Data to Register */
     AM_R_R,		/* Addressing Mode Register to Register */
-    AM_MR_R,	/* Addressing Mode Register to Memory Register */
+    AM_MR_R,	/* Addressing Mode Register to Memory Register (address) */
     AM_R,		/* Addressing Mode Register */
     AM_R_D8,	/* Addressing Mode 8b Data to Register */
     AM_R_MR,	/* Addressing Mode Memory Register to Register */
-    AM_R_HLI,
-    AM_R_HLD,
-    AM_HLI_R,
-    AM_HLD_R,
-    AM_R_A8,
-    AM_A8_R,
-    AM_HL_SPR,
+    AM_R_HLI,	/* Addressing Mode Memory Address to Register and the incremented */
+    AM_R_HLD,	/* Addressing Mode Memory Address to Register and the decremented */
+    AM_HLI_R,	/* Addressing Mode Register to Memory Address and the incremented */
+    AM_HLD_R,	/* Addressing Mode Register to Memory Address and the decremented */
+    AM_R_A8,	/* Addressing Mode 8b Address to Register */
+    AM_A8_R,	/* Addressing Mode Register to 8b Address */
+    AM_HL_SPR,	/* Addressing Mode Stack Pointer Register to Memory Address */
     AM_D16,		/* Addressing Mode 16b Data */
     AM_D8,		/* Addressing Mode 8b Data */
     AM_D16_R,	/* Addressing Mode Register to 16b Data */
-    AM_MR_D8,	/* Addressing Mode 8b Data to Memory Register */
-    AM_MR,		/* Addressing Mode Memory Register */
-    AM_A16_R,
-    AM_R_A16
+    AM_MR_D8,	/* Addressing Mode 8b Data to Memory Register (address) */
+    AM_MR,		/* Addressing Mode Memory Register (address) */
+    AM_A16_R,	/* Addressing Mode Register to 16b Address */
+    AM_R_A16	/* Addressing Mode 16b Address to Register */
 } addr_mode;
 
 typedef enum {
