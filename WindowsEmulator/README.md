@@ -1,7 +1,7 @@
-# MicroConsole Project
+# Windows Emulator
 
-## Windows Emulator (on going)
-Emulator developed in C that runs on Windows
+## Architecture (TBD)
+
 
 ### Build targets
 Makefile can build 2 targets:
@@ -16,6 +16,3 @@ To launch the emulator run the following command:
 where:
  - 05_build\\microConsole.exe is the emulator executable
  - 06_roms\\01-special.gb is the ROM to launch
-
-## STM Emulator
-TBD
