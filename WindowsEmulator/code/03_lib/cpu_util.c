@@ -51,6 +51,12 @@ u16 cpu_read_reg(reg_type rt)
     }
 }
 
+/**
+  * @brief  Write data in a register
+  * @param  rt:		register to read
+  * 		val:	value to write
+  * @retval None
+  */
 void cpu_set_reg(reg_type rt, u16 val) {
     switch(rt) {
         case RT_A: cpu_ctx.regs.a = val & 0xFF; break;

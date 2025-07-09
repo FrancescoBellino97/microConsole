@@ -93,8 +93,6 @@ static void fetch_instruction()
 	cpu_ctx.cur_inst = instruction_by_opcode(cpu_ctx.cur_opcode);
 }
 
-
-
 /**
   * @brief  Execute the instruction fetched
   * @param  None

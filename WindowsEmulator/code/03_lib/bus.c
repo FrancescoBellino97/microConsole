@@ -30,7 +30,7 @@
 
 
 /**
-  * @brief  Read data from cart at a specific address
+  * @brief  Read 8b data from cart at a specific address
   * @param  address:	address to read
   * @retval uint8_t:	data read
   */
@@ -49,7 +49,7 @@ u8 bus_read(u16 address)
 }
 
 /**
-  * @brief  Write data to cart at a specific address
+  * @brief  Write 8b data to cart at a specific address
   * @param  address:	address to write
   * @retval None
   */
@@ -68,6 +68,11 @@ void bus_write(u16 address, u8 value)
     NO_IMPL
 }
 
+/**
+  * @brief  Read 16b data from cart at a specific address
+  * @param  address:	address to read
+  * @retval uint8_t:	data read
+  */
 u16 bus_read16(u16 address) {
     u16 lo = bus_read(address);
     u16 hi = bus_read(address + 1);
@@ -75,6 +80,11 @@ u16 bus_read16(u16 address) {
     return lo | (hi << 8);
 }
 
+/**
+  * @brief  Write 16b data to cart at a specific address
+  * @param  address:	address to write
+  * @retval None
+  */
 void bus_write16(u16 address, u16 value) {
     bus_write(address + 1, (value >> 8) & 0xFF);
     bus_write(address, value & 0xFF);
