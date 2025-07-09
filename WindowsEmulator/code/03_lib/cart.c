@@ -9,10 +9,9 @@
 
 #include <cart.h>
 
+#if DEBUG==true
 static const char *cart_lic_name();
 static const char *cart_type_name();
-
-#if DEBUG==true
 static void print_cart_info();
 #endif
 
@@ -26,6 +25,7 @@ typedef struct
 
 static cart_context cart_ctx;
 
+#if DEBUG==true
 static const char *ROM_TYPES[] =
 {
     "ROM ONLY",
@@ -129,7 +129,7 @@ static const char *LIC_CODE[0xA5] =
     [0x99] = "Pack in soft",
     [0xA4] = "Konami (Yu-Gi-Oh!)"
 };
-
+#endif
 
 
 /**
@@ -215,6 +215,7 @@ void cart_write(u16 address, u8 value)
     NO_IMPL
 }
 
+#if DEBUG == true
 /**
   * @brief  Get the license name from the new license code
   * @param  None
@@ -230,7 +231,9 @@ static const char *cart_lic_name()
     /* Code read unknown */
     return "UNKNOWN";
 }
+#endif
 
+#if DEBUG == true
 /**
   * @brief  Get the cart type
   * @param  None
@@ -247,6 +250,7 @@ static const char *cart_type_name()
     /* Code read unknown */
     return "UNKNOWN";
 }
+#endif
 
 #if DEBUG==true
 /**

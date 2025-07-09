@@ -77,7 +77,7 @@ OBJDUMP			:=	C:\msys64\ucrt64\bin\objdump
 
 
 #		TARGETS
-.PHONY: all cleanall
+.PHONY: all cleanall mem_usage
 
 all: $(BUILD_DIR) $(DLLS) $(BUILD_DIR)/$(PROJECT_NAME).exe $(BUILD_DIR)/$(PROJECT_NAME).lst $(BUILD_DIR)/$(PROJECT_NAME).hdr $(BUILD_DIR)/memory_usage.txt
 	
@@ -86,6 +86,9 @@ cleanall:	#Delete directory recursively (/S) and without confirm (/Q)
 	@if exist "$(BUILD_DIR)" rmdir /Q /S "$(BUILD_DIR)"
 	@echo Deleting build directory
 
+
+mem_usage: $(BUILD_DIR)/$(PROJECT_NAME).exe $(BUILD_DIR)/$(PROJECT_NAME).hdr
+	@$(MEM_USAGE) $(BUILD_DIR)/$(PROJECT_NAME).hdr
 
 #		BUILD PROCESS
 $(BUILD_DIR)/$(PROJECT_NAME).exe: $(OBJS)
