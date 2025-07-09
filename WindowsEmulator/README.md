@@ -7,6 +7,7 @@
 Makefile can build 2 targets:
  - make all, build the project in 05_build/ directory and print the memory consumption estimation on console
  - make cleanall, delete the 05_build/ directory
+ - make mem_usage, print the memory usage (it builds the project if it is not present)
 
 NOTE: the code can be compiled for debug setting the relative define in "commons.h" to true or without debug (to save resources) setting the define to false.
 
