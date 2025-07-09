@@ -82,44 +82,51 @@ all: $(BUILD_DIR) $(DLLS) $(BUILD_DIR)/$(PROJECT_NAME).exe $(BUILD_DIR)/$(PROJEC
 	
 
 cleanall:	#Delete directory recursively (/S) and without confirm (/Q)
-	if exist "$(BUILD_DIR)" rmdir /Q /S "$(BUILD_DIR)"
+	@if exist "$(BUILD_DIR)" rmdir /Q /S "$(BUILD_DIR)"
+	@echo Deleting build directory
 
 
 #		BUILD PROCESS
 $(BUILD_DIR)/$(PROJECT_NAME).exe: $(OBJS)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $^ $(DLLFLAGS) -o $@ -Wl,-Map="$(BUILD_DIR)/$(PROJECT_NAME).map"
+	@$(CC) $(CFLAGS) $(CPPFLAGS) $^ $(DLLFLAGS) -o $@ -Wl,-Map="$(BUILD_DIR)/$(PROJECT_NAME).map"
+	@echo Creating $@
 	
 $(BUILD_DIR)/$(PROJECT_NAME).lst: $(BUILD_DIR)/$(PROJECT_NAME).exe
-	$(OBJDUMP) -S $^ > $@
+	@$(OBJDUMP) -S $^ > $@
 
 $(BUILD_DIR)/$(PROJECT_NAME).hdr: $(BUILD_DIR)/$(PROJECT_NAME).exe
-	$(OBJDUMP) -h $^ > $@
+	@$(OBJDUMP) -h $^ > $@
 
 
 $(BUILD_DIR)/memory_usage.txt: $(BUILD_DIR)/$(PROJECT_NAME).hdr
-	$(MEM_USAGE) $^ > $@
-	$(MEM_USAGE) $^
+	@$(MEM_USAGE) $^ > $@
+	@$(MEM_USAGE) $^
 
 #		MAIN
 $(BUILD_SUPP_DIR)/%.o: $(APP_DIR)/%.c 
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(DLLFLAGS) -o $@
+	@$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(DLLFLAGS) -o $@
+	@echo Compiling $<
 
 #		LIB
 $(BUILD_SUPP_DIR)/%.o: $(LIB_DIR)/%.c 
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(DLLFLAGS) -o $@
+	@$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(DLLFLAGS) -o $@
+	@echo Compiling $<
 
 
 #		BUILD DIRECTORY CREATION
 $(BUILD_DIR):
-	mkdir "$(BUILD_SUPP_DIR)"
+	@mkdir "$(BUILD_SUPP_DIR)"
 
 
 #		DLL TRASFER TO BUILD DIRECTORY
 $(BUILD_DIR)\SDL2.dll:
-	copy $(SDL_PATH)\SDL2.dll $(BUILD_DIR)
+	@copy $(SDL_PATH)\SDL2.dll $(BUILD_DIR) > NUL
+	@echo Moving $@ to build directory
 	
 $(BUILD_DIR)\SDL2_ttf.dll:
-	copy $(SDL_TTF_PATH)\SDL2_ttf.dll $(BUILD_DIR)
+	@copy $(SDL_TTF_PATH)\SDL2_ttf.dll $(BUILD_DIR) > NUL
+	@echo Moving $@ to build directory
 	
 $(BUILD_DIR)\libfreetype-6.dll:
-	copy $(SDL_TTF_PATH)\libfreetype-6.dll $(BUILD_DIR)
+	@copy $(SDL_TTF_PATH)\libfreetype-6.dll $(BUILD_DIR) > NUL
+	@echo Moving $@ to build directory
