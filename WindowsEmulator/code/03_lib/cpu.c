@@ -11,11 +11,11 @@
 #include <cpu.h>
 #include <cpu_util.h>
 #include <cpu_proc.h>
+#include <cpu_fetch.h>
 #include <bus.h>
 
 
 static void fetch_instruction();
-static void fetch_data();
 static void execute();
 
 #if DEBUG==true
@@ -93,58 +93,7 @@ static void fetch_instruction()
 	cpu_ctx.cur_inst = instruction_by_opcode(cpu_ctx.cur_opcode);
 }
 
-/**
-  * @brief  Fetch data according to the instruction loaded
-  * @param  None
-  * @retval None
-  */
-static void fetch_data()
-{
-	cpu_ctx.mem_dest = 0;
-	cpu_ctx.dest_is_mem = false;
 
-    if (cpu_ctx.cur_inst == NULL)
-    {
-        return;
-    }
-
-    /* Based on the Addressing Mode read from Bus more data */
-    switch(cpu_ctx.cur_inst->mode)
-    {
-        case AM_IMP: return;
-
-        case AM_R:
-        	cpu_ctx.fetched_data = cpu_read_reg(cpu_ctx.cur_inst->reg_1);
-            return;
-
-        case AM_R_D8:
-        	cpu_ctx.fetched_data = bus_read(cpu_ctx.regs.pc);
-            emu_cycles(1);
-            cpu_ctx.regs.pc++;
-            return;
-
-        case AM_D16: {
-            u16 lo = bus_read(cpu_ctx.regs.pc);
-            emu_cycles(1);
-
-            u16 hi = bus_read(cpu_ctx.regs.pc + 1);
-            emu_cycles(1);
-
-            cpu_ctx.fetched_data = lo | (hi << 8);
-
-            cpu_ctx.regs.pc += 2;
-
-            return;
-        }
-
-        default:
-#if DEBUG==true
-            printf("Unknown Addressing Mode! %d (%02X)\n", cpu_ctx.cur_inst->mode, cpu_ctx.cur_opcode);
-#endif
-            exit(ERR_UNKNOWM_ADDRESS_MODE);
-            return;
-    }
-}
 
 /**
   * @brief  Execute the instruction fetched
@@ -174,7 +123,7 @@ static void execute()
 static void print_header()
 {
 	printf("\n");
-	printf("PC\t\tINST\t(OP OP+1 OP+2)\tA\tB\tC\tD\tH\tL\tZC");
+	printf("PC\t\tINST\t(OP OP+1 OP+2)\tA\tB\tC\tD\tH\tL\tZC\tSP");
 	printf("\n");
 }
 #endif
@@ -188,11 +137,11 @@ static void print_header()
 static void print_instruction(u16 old_pc)
 {
 	printf(
-			"%04X:\t%-7s\t(%02X   %02X   %02X)\t%02X\t%02X\t%02X\t%02X\t%02X\t%02X\t%01X%01X\n",
+			"%04X:\t%-7s\t(%02X   %02X   %02X)\t%02X\t%02X\t%02X\t%02X\t%02X\t%02X\t%01X%01X\t%04X\n",
 			old_pc, inst_name(cpu_ctx.cur_inst->type),
 			cpu_ctx.cur_opcode, bus_read(old_pc + 1), bus_read(old_pc + 2),
 			cpu_ctx.regs.a, cpu_ctx.regs.b, cpu_ctx.regs.c, cpu_ctx.regs.d, cpu_ctx.regs.h, cpu_ctx.regs.l,
-			BIT(cpu_ctx.regs.f, BIT_Z), BIT(cpu_ctx.regs.f, BIT_C)
+			BIT(cpu_ctx.regs.f, BIT_Z), BIT(cpu_ctx.regs.f, BIT_C), cpu_ctx.regs.sp
 			);
 }
 #endif

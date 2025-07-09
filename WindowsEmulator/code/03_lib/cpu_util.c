@@ -51,6 +51,28 @@ u16 cpu_read_reg(reg_type rt)
     }
 }
 
+void cpu_set_reg(reg_type rt, u16 val) {
+    switch(rt) {
+        case RT_A: cpu_ctx.regs.a = val & 0xFF; break;
+        case RT_F: cpu_ctx.regs.f = val & 0xFF; break;
+        case RT_B: cpu_ctx.regs.b = val & 0xFF; break;
+        case RT_C: cpu_ctx.regs.c = val & 0xFF; break;
+        case RT_D: cpu_ctx.regs.d = val & 0xFF; break;
+        case RT_E: cpu_ctx.regs.e = val & 0xFF; break;
+        case RT_H: cpu_ctx.regs.h = val & 0xFF; break;
+        case RT_L: cpu_ctx.regs.l = val & 0xFF; break;
+
+        case RT_AF: *((u16 *)&cpu_ctx.regs.a) = reverse(val); break;
+        case RT_BC: *((u16 *)&cpu_ctx.regs.b) = reverse(val); break;
+        case RT_DE: *((u16 *)&cpu_ctx.regs.d) = reverse(val); break;
+        case RT_HL: *((u16 *)&cpu_ctx.regs.h) = reverse(val); break;
+
+        case RT_PC: cpu_ctx.regs.pc = val; break;
+        case RT_SP: cpu_ctx.regs.sp = val; break;
+        case RT_NONE: break;
+    }
+}
+
 /**
   * @brief  Set the value in flag register
   * @param  ctx:	context of the CPU
