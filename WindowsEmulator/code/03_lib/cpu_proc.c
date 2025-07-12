@@ -115,11 +115,19 @@ static void proc_ld(cpu_context *ctx) {
     cpu_set_reg(ctx->cur_inst->reg_1, ctx->fetched_data);
 }
 
+/**
+  * @brief  Emulation of LDH (LOAD to/from address)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
 static void proc_ldh(cpu_context *ctx)
 {
-    if (ctx->cur_inst->reg_1 == RT_A) {
+    if (ctx->cur_inst->reg_1 == RT_A)
+    {
         cpu_set_reg(ctx->cur_inst->reg_1, bus_read(0xFF00 | ctx->fetched_data));
-    } else {
+    }
+    else
+    {
         bus_write(0xFF00 | ctx->fetched_data, ctx->regs.a);
     }
 

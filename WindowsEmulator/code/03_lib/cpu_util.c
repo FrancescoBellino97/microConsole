@@ -78,6 +78,7 @@ void cpu_set_reg(reg_type rt, u16 val) {
         case RT_NONE: break;
     }
 }
+
 /**
   * @brief  Read data from interrupt register
   * @param  None
