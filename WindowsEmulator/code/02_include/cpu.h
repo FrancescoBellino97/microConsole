@@ -45,6 +45,7 @@ typedef struct {
     bool stepping;				/* Flag for Running CPU */
 
     bool int_master_enabled;	/* Flag for Interrupts enabled? */
+    u8 ie_register;				/* Interrupt register */
     
 } cpu_context;
 

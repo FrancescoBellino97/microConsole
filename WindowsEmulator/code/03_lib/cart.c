@@ -20,6 +20,7 @@ typedef struct
     char filename[MAX_TITLE_LEN];
     u32 rom_size;
     u8 rom_data[ROM_SIZE];
+    u8 ram_data[RAM_SIZE];
     rom_header *header;
 } cart_context;
 
@@ -164,8 +165,14 @@ bool cart_load(char *cart)
     /* Restart File Pointer */
     rewind(fp);
 
-    /* Read data from Cartrdige to RAM*/
-    fread(cart_ctx.rom_data, END_BANK1_ROM, 1, fp);
+    /* Load ROM bank 0 and Bank 1 data from Cartrdige to RAM*/
+    fread(cart_ctx.rom_data, END_ROM_BANK1, 1, fp);
+
+    /* Skip VRAM data*/
+    fread(NULL, END_VRAM-START_VRAM, 1, fp);
+
+    /* Load External RAM data from Cartrdige to RAM */
+    fread(NULL, END_EXT_RAM-START_EXT_RAM, 1, fp);
 
     /* Close Cartridge file */
     fclose(fp);
@@ -199,8 +206,13 @@ bool cart_load(char *cart)
   */
 u8 cart_read(u16 address)
 {
-    /* Read and return the address */
-    return cart_ctx.rom_data[address];
+	if(address < END_ROM_BANK1)
+	{
+		/* Read and return the address */
+		return cart_ctx.rom_data[address];
+	}
+	/* Read and return the address */
+	return cart_ctx.rom_data[address - START_EXT_RAM];
 }
 
 /**

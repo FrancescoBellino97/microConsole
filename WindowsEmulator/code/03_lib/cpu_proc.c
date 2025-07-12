@@ -19,6 +19,7 @@ static void proc_none(cpu_context *ctx);
 static void proc_nop(cpu_context *ctx) {};
 static void proc_di(cpu_context *ctx);
 static void proc_ld(cpu_context *ctx);
+static void proc_ldh(cpu_context *ctx);
 static void proc_xor(cpu_context *ctx);
 static void proc_jp(cpu_context *ctx);
 
@@ -30,7 +31,8 @@ static IN_PROC processors[] =
     [IN_LD] = proc_ld,
     [IN_JP] = proc_jp,
     [IN_DI] = proc_di,
-    [IN_XOR] = proc_xor
+    [IN_XOR] = proc_xor,
+	[IN_LDH] = proc_ldh
 };
 
 /**
@@ -75,21 +77,28 @@ static void proc_di(cpu_context *ctx)
   * @retval None
   */
 static void proc_ld(cpu_context *ctx) {
-    if (ctx->dest_is_mem) {
+    if (ctx->dest_is_mem)
+    {
         //LD (BC), A for instance...
 
-        if (ctx->cur_inst->reg_2 >= RT_AF) {
+        if (ctx->cur_inst->reg_2 >= RT_AF) 
+        {
             //if 16 bit register...
             emu_cycles(1);
             bus_write16(ctx->mem_dest, ctx->fetched_data);
-        } else {
+        } 
+        else 
+        {
             bus_write(ctx->mem_dest, ctx->fetched_data);
         }
 
+        emu_cycles(1);
+        
         return;
     }
 
-    if (ctx->cur_inst->mode == AM_HL_SPR) {
+    if (ctx->cur_inst->mode == AM_HL_SPR) 
+    {
         u8 hflag = (cpu_read_reg(ctx->cur_inst->reg_2) & 0xF) + 
             (ctx->fetched_data & 0xF) >= 0x10;
 
@@ -104,6 +113,17 @@ static void proc_ld(cpu_context *ctx) {
     }
 
     cpu_set_reg(ctx->cur_inst->reg_1, ctx->fetched_data);
+}
+
+static void proc_ldh(cpu_context *ctx)
+{
+    if (ctx->cur_inst->reg_1 == RT_A) {
+        cpu_set_reg(ctx->cur_inst->reg_1, bus_read(0xFF00 | ctx->fetched_data));
+    } else {
+        bus_write(0xFF00 | ctx->fetched_data, ctx->regs.a);
+    }
+
+    emu_cycles(1);
 }
 
 /**

@@ -9,6 +9,8 @@
  
 #include <bus.h>
 #include <cart.h>
+#include <ram.h>
+#include <cpu_util.h>
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                     CARTRIDGE MEMORY MAP                      *
@@ -36,16 +38,59 @@
   */
 u8 bus_read(u16 address)
 {
-	/* Check if the address is ROM Bank 0 or 1 */
-    if (address < 0x8000) {
+    if (address <= END_ROM_BANK1) {
+    	/* ROM DATA */
         return cart_read(address);
     }
+    else if (address <= END_VRAM)
+    {
+    	/* Char / Map Data */
+    	//TODO
+    	printf("UNSUPPORTED bus_read(%04X)\n", address);
+    	NO_IMPL
+    }
+    else if (address <= END_EXT_RAM)
+    {
+    	/* EXTERNAL RAM */
+    	return cart_read(address);
+    }
+    else if (address <= END_WRAM)
+    {
+    	/* WRAM */
+    	return wram_read(address);
+    }
+    else if (address <= END_RESERVED1)
+    {
+    	/* RESERVED */
+    	return 0;
+    }
+    else if (address <= END_OAM)
+    {
+    	/* OAM */
+    	//TODO
+    	printf("UNSUPPORTED bus_read(%04X)\n", address);
+    	NO_IMPL
+    }
+    else if (address <= END_RESERVED2)
+    {
+    	/* RESERVED */
+    	return 0;
+    }
+    else if (address <= END_IO_REG)
+    {
+    	/* IO Registers */
+    	//TODO
+    	printf("UNSUPPORTED bus_read(%04X)\n", address);
+    	NO_IMPL
+    }
+    else if (address <= END_HRAM)
+    {
+    	 return hram_read(address);
+    }
 
-#if DEBUG == true
-	printf("UNSUPPORTED bus_read(%04X)\n", address);
-#endif
-
-    NO_IMPL
+    /* CPU ENABLE REGISTER */
+    //TODO
+    return cpu_get_ie_register();
 }
 
 /**
@@ -55,17 +100,62 @@ u8 bus_read(u16 address)
   */
 void bus_write(u16 address, u8 value)
 {
-	/* Check if the address is ROM Bank 0 or 1 */
-    if (address < 0x8000) {
+    if (address <= END_ROM_BANK1)
+    {
+    	/* ROM DATA */
         cart_write(address, value);
-        return;
     }
-    
-#if DEBUG == true
-	printf("UNSUPPORTED bus_write(%04X)\n", address);
-#endif
+    else if (address <= END_VRAM)
+    {
+    	/* CHAR / MAP DATA */
+        //TODO
+        printf("UNSUPPORTED bus_write(%04X)\n", address);
+        NO_IMPL
+    }
+    else if (address <= END_EXT_RAM)
+    {
+    	/* EXTERNAL RAM */
+        cart_write(address, value);
+    }
+    else if (address <= END_WRAM)
+    {
+    	/* WRAM */
+        wram_write(address, value);
+    }
+    else if (address <= END_RESERVED1)
+    {
+        /* RESERVED */
+    }
+    else if (address <= END_OAM)
+    {
+    	/* OAM */
 
-    NO_IMPL
+        //TODO
+        printf("UNSUPPORTED bus_write(%04X)\n", address);
+        NO_IMPL
+    }
+    else if (address <= END_RESERVED2)
+    {
+    	/* RESERVED */
+    }
+    else if (address <= END_IO_REG)
+    {
+    	/* IO REGISTER */
+        //TODO
+        printf("UNSUPPORTED bus_write(%04X)\n", address);
+        //NO_IMPL
+    }
+    else if (address <= END_IO_REG)
+    {
+    	/* HRAM */
+    	hram_write(address, value);
+    }
+    else
+    {
+        //CPU SET ENABLE REGISTER
+
+        cpu_set_ie_register(value);
+    }
 }
 
 /**

@@ -78,6 +78,25 @@ void cpu_set_reg(reg_type rt, u16 val) {
         case RT_NONE: break;
     }
 }
+/**
+  * @brief  Read data from interrupt register
+  * @param  None
+  * @retval u8:		content of the register
+  */
+u8 cpu_get_ie_register()
+{
+	 return cpu_ctx.ie_register;
+}
+
+/**
+  * @brief  Write data in interrupt register
+  * @param  val:	value to write
+  * @retval None
+  */
+void cpu_set_ie_register(u8 val)
+{
+	cpu_ctx.ie_register = val;
+}
 
 /**
   * @brief  Set the value in flag register
