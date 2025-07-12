@@ -32,6 +32,7 @@ bool cpu_step() {
         u16 pc = ctx.regs.pc;
 
         fetch_instruction();
+        emu_cycles(1);
         fetch_data();
 
         printf("%04X: %-7s (%02X %02X %02X) A: %02X BC: %02X%02X DE: %02X%02X HL: %02X%02X\n", 
