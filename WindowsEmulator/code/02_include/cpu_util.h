@@ -14,6 +14,7 @@
 #include <cpu.h>
 
 u16 reverse(u16 n);
+cpu_registers *cpu_get_regs();
 u16 cpu_read_reg(reg_type rt);
 void cpu_set_reg(reg_type rt, u16 val);
 u8 cpu_get_ie_register();

@@ -12,6 +12,7 @@
 #include <cpu_util.h>
 #include <cpu_proc.h>
 #include <bus.h>
+#include <stack.h>
 
 
 /* Emulation of CPU Instructions */
@@ -22,6 +23,14 @@ static void proc_ld(cpu_context *ctx);
 static void proc_ldh(cpu_context *ctx);
 static void proc_xor(cpu_context *ctx);
 static void proc_jp(cpu_context *ctx);
+static void proc_jr(cpu_context *ctx);
+static void proc_call(cpu_context *ctx);
+static void proc_rst(cpu_context *ctx);
+static void proc_ret(cpu_context *ctx);
+static void proc_reti(cpu_context *ctx);
+static void proc_pop(cpu_context *ctx);
+static void proc_push(cpu_context *ctx);
+static void goto_addr(cpu_context *ctx, u16 addr, bool pushpc);
 
 /* Look-Up table to convert OpCode to Instruction Callback */
 static IN_PROC processors[] =
@@ -29,10 +38,17 @@ static IN_PROC processors[] =
     [IN_NONE] = proc_none,
     [IN_NOP] = proc_nop,
     [IN_LD] = proc_ld,
+    [IN_LDH] = proc_ldh,
     [IN_JP] = proc_jp,
     [IN_DI] = proc_di,
-    [IN_XOR] = proc_xor,
-	[IN_LDH] = proc_ldh
+    [IN_POP] = proc_pop,
+    [IN_PUSH] = proc_push,
+    [IN_JR] = proc_jr,
+    [IN_CALL] = proc_call,
+    [IN_RET] = proc_ret,
+    [IN_RST] = proc_rst,
+    [IN_RETI] = proc_reti,
+    [IN_XOR] = proc_xor
 };
 
 /**
@@ -152,8 +168,136 @@ static void proc_xor(cpu_context *ctx)
   */
 static void proc_jp(cpu_context *ctx)
 {
-    if (check_cond(ctx)) {
-        ctx->regs.pc = ctx->fetched_data;
+	goto_addr(ctx, ctx->fetched_data, false);
+}
+
+/**
+  * @brief  Emulation of JR (jump relative address)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_jr(cpu_context *ctx)
+{
+    char rel = (char)(ctx->fetched_data & 0xFF);
+    u16 addr = ctx->regs.pc + rel;
+    goto_addr(ctx, addr, false);
+}
+
+/**
+  * @brief  Emulation of CALL (jump address if condition is true and save current PC)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_call(cpu_context *ctx)
+{
+    goto_addr(ctx, ctx->fetched_data, true);
+}
+
+/**
+  * @brief  Emulation of RST (jump address and save current PC)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_rst(cpu_context *ctx)
+{
+    goto_addr(ctx, ctx->cur_inst->param, true);
+}
+
+/**
+  * @brief  Emulation of RET (return to last address saved)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_ret(cpu_context *ctx)
+{
+    if (ctx->cur_inst->cond != CT_NONE)
+    {
+        emu_cycles(1);
+    }
+
+    if (check_cond(ctx))
+    {
+        u16 lo = stack_pop();
+        emu_cycles(1);
+        u16 hi = stack_pop();
+        emu_cycles(1);
+
+        u16 n = (hi << 8) | lo;
+        ctx->regs.pc = n;
+
+        emu_cycles(1);
+    }
+}
+
+/**
+  * @brief  Emulation of RETI (return from interrupt to last address saved)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_reti(cpu_context *ctx)
+{
+    ctx->int_master_enabled = true;
+    proc_ret(ctx);
+}
+
+/**
+  * @brief  Emulation of POP (get value from STACK)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_pop(cpu_context *ctx)
+{
+    u16 lo = stack_pop();
+    emu_cycles(1);
+    u16 hi = stack_pop();
+    emu_cycles(1);
+
+    u16 n = (hi << 8) | lo;
+
+    cpu_set_reg(ctx->cur_inst->reg_1, n);
+
+    if (ctx->cur_inst->reg_1 == RT_AF)
+    {
+        cpu_set_reg(ctx->cur_inst->reg_1, n & 0xFFF0);
+    }
+}
+
+/**
+  * @brief  Emulation of PUSH (put value to STACK)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_push(cpu_context *ctx)
+{
+    u16 hi = (cpu_read_reg(ctx->cur_inst->reg_1) >> 8) & 0xFF;
+    emu_cycles(1);
+    stack_push(hi);
+
+    u16 lo = cpu_read_reg(ctx->cur_inst->reg_1) & 0xFF;
+    emu_cycles(1);
+    stack_push(lo);
+
+    emu_cycles(1);
+}
+
+/**
+  * @brief  Generic jump to address
+  * @param  ctx:		context of the CPU
+  * 		addr:		address to jump
+  * 		pushpc:		flag to save in stack current PC
+  * @retval None
+  */
+static void goto_addr(cpu_context *ctx, u16 addr, bool pushpc)
+{
+    if (check_cond(ctx))
+    {
+        if (pushpc)
+        {
+            emu_cycles(2);
+            stack_push16(ctx->regs.pc);
+        }
+
+        ctx->regs.pc = addr;
         emu_cycles(1);
     }
 }

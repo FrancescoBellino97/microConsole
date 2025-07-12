@@ -44,6 +44,10 @@ void fetch_data()
         case AM_R:
         	cpu_ctx.fetched_data = cpu_read_reg(cpu_ctx.cur_inst->reg_1);
             return;
+            
+        case AM_R_R:
+        	cpu_ctx.fetched_data = cpu_read_reg(cpu_ctx.cur_inst->reg_2);
+        	return;
 
         case AM_R_D8:
         	cpu_ctx.fetched_data = bus_read(cpu_ctx.regs.pc);

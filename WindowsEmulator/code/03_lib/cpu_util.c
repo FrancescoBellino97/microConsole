@@ -23,6 +23,15 @@ u16 reverse(u16 n)
 }
 
 /**
+  * @brief  Return all the registers
+  * @param  None
+  * @retval cpu_registers*:	structure with the registers updated
+  */
+cpu_registers *cpu_get_regs() {
+    return &cpu_ctx.regs;
+}
+
+/**
   * @brief  Read and return the content of a register
   * @param  rt:		register to read
   * @retval u16:	content of the register (or 0 if register is unknown)
