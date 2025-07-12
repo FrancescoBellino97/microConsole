@@ -17,7 +17,7 @@ static void print_cart_info();
 
 typedef struct
 {
-    char filename[1024];
+    char filename[MAX_TITLE_LEN];
     u32 rom_size;
     u8 rom_data[ROM_SIZE];
     rom_header *header;

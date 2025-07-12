@@ -15,6 +15,7 @@
 
 #define	KB					1024
 #define ROM_SIZE			32*KB
+#define	MAX_TITLE_LEN		16
 
 #define START_BANK0_ROM		0x0000
 #define END_BANK0_ROM		0x3FFF
