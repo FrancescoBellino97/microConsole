@@ -13,7 +13,15 @@
 
 #include <common.h>
 
-#define MAX_ROM_SIZE	65536
+#define	KB					1024
+#define ROM_SIZE			32*KB
+
+#define START_BANK0_ROM		0x0000
+#define END_BANK0_ROM		0x3FFF
+#define START_BANK1_ROM		0x4000
+#define END_BANK1_ROM		0x7FFF
+
+
 
 typedef struct {
     u8 entry[4];

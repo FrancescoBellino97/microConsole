@@ -19,7 +19,7 @@ typedef struct
 {
     char filename[1024];
     u32 rom_size;
-    u8 rom_data[MAX_ROM_SIZE];
+    u8 rom_data[ROM_SIZE];
     rom_header *header;
 } cart_context;
 
@@ -165,7 +165,7 @@ bool cart_load(char *cart)
     rewind(fp);
 
     /* Read data from Cartrdige to RAM*/
-    fread(cart_ctx.rom_data, cart_ctx.rom_size, 1, fp);
+    fread(cart_ctx.rom_data, END_BANK1_ROM, 1, fp);
 
     /* Close Cartridge file */
     fclose(fp);
