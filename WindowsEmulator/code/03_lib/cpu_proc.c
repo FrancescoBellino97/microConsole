@@ -23,7 +23,7 @@ void cpu_set_flags(cpu_context *ctx, char z, char n, char h, char c) {
 }
 
 static void proc_none(cpu_context *ctx) {
-    printf("INVALID INSTRUCTION!\n");
+    printf("INVALID INSTRUCTION: %02X\n", ctx->cur_opcode);
     exit(-7);
 }
 
@@ -47,6 +47,8 @@ static void proc_ld(cpu_context *ctx) {
             bus_write(ctx->mem_dest, ctx->fetched_data);
         }
 
+        emu_cycles(1);
+        
         return;
     }
 
@@ -65,6 +67,16 @@ static void proc_ld(cpu_context *ctx) {
     }
 
     cpu_set_reg(ctx->cur_inst->reg_1, ctx->fetched_data);
+}
+
+static void proc_ldh(cpu_context *ctx) {
+    if (ctx->cur_inst->reg_1 == RT_A) {
+        cpu_set_reg(ctx->cur_inst->reg_1, bus_read(0xFF00 | ctx->fetched_data));
+    } else {
+        bus_write(0xFF00 | ctx->fetched_data, ctx->regs.a);
+    }
+
+    emu_cycles(1);
 }
 
 static void proc_xor(cpu_context *ctx) {
@@ -99,6 +111,7 @@ static IN_PROC processors[] = {
     [IN_NONE] = proc_none,
     [IN_NOP] = proc_nop,
     [IN_LD] = proc_ld,
+    [IN_LDH] = proc_ldh,
     [IN_JP] = proc_jp,
     [IN_DI] = proc_di,
     [IN_XOR] = proc_xor
