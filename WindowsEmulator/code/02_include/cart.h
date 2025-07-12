@@ -13,6 +13,8 @@
 
 #include <common.h>
 
+#define MAX_ROM_SIZE	65536
+
 typedef struct {
     u8 entry[4];
     u8 logo[0x30];
