@@ -9,8 +9,21 @@
 
 #include <cpu.h>
 #include <cpu_util.h>
+#include <bus.h>
 
 extern cpu_context cpu_ctx;
+
+/* Look-Up table for CB instructions */
+reg_type rt_lookup[] = {
+    RT_B,
+    RT_C,
+    RT_D,
+    RT_E,
+    RT_H,
+    RT_L,
+    RT_HL,
+    RT_A
+};
 
 /**
   * @brief  Reverse the LSB Byte with the MSB Byte
@@ -85,6 +98,58 @@ void cpu_set_reg(reg_type rt, u16 val) {
         case RT_PC: cpu_ctx.regs.pc = val; break;
         case RT_SP: cpu_ctx.regs.sp = val; break;
         case RT_NONE: break;
+    }
+}
+
+/**
+  * @brief  Read and return the content of a 8 bit register
+  * @param  rt:		register to read
+  * @retval u16:	content of the register (or 0 if register is unknown)
+  */
+u8 cpu_read_reg8(reg_type rt)
+{
+    switch(rt)
+    {
+        case RT_A: return cpu_ctx.regs.a;
+        case RT_F: return cpu_ctx.regs.f;
+        case RT_B: return cpu_ctx.regs.b;
+        case RT_C: return cpu_ctx.regs.c;
+        case RT_D: return cpu_ctx.regs.d;
+        case RT_E: return cpu_ctx.regs.e;
+        case RT_H: return cpu_ctx.regs.h;
+        case RT_L: return cpu_ctx.regs.l;
+        case RT_HL:
+        {
+            return bus_read(cpu_read_reg(RT_HL));
+        }
+        default:
+            printf("**ERR INVALID REG8: %d\n", rt);
+            NO_IMPL
+    }
+}
+
+/**
+  * @brief  Write data in a 8 bit register
+  * @param  rt:		register to read
+  * 		val:	value to write
+  * @retval None
+  */
+void cpu_set_reg8(reg_type rt, u8 val)
+{
+    switch(rt)
+    {
+        case RT_A: cpu_ctx.regs.a = val & 0xFF; break;
+        case RT_F: cpu_ctx.regs.f = val & 0xFF; break;
+        case RT_B: cpu_ctx.regs.b = val & 0xFF; break;
+        case RT_C: cpu_ctx.regs.c = val & 0xFF; break;
+        case RT_D: cpu_ctx.regs.d = val & 0xFF; break;
+        case RT_E: cpu_ctx.regs.e = val & 0xFF; break;
+        case RT_H: cpu_ctx.regs.h = val & 0xFF; break;
+        case RT_L: cpu_ctx.regs.l = val & 0xFF; break;
+        case RT_HL: bus_write(cpu_read_reg(RT_HL), val); break;
+        default:
+            printf("**ERR INVALID REG8: %d\n", rt);
+            NO_IMPL
     }
 }
 
@@ -167,4 +232,19 @@ bool is_16_bit(reg_type rt)
 {
 	/* From reg type structure order, after RT_AF are 16 bit */
     return rt >= RT_AF;
+}
+
+/**
+  * @brief  Decode the register used in CB instructions depending on the order in table
+  * @param  reg:		first 3 bit of the OpCode of CB that represent the register
+  * @retval reg_type:	register type decoded (RT_NONE if not in Look-Up table)
+  */
+reg_type decode_reg(u8 reg)
+{
+    if (reg > 0b111)
+    {
+        return RT_NONE;
+    }
+
+    return rt_lookup[reg];
 }

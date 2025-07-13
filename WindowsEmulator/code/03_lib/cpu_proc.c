@@ -17,11 +17,15 @@
 
 /* Emulation of CPU Instructions */
 static void proc_none(cpu_context *ctx);
+static void proc_cb(cpu_context *ctx);
+static void proc_and(cpu_context *ctx);
+static void proc_xor(cpu_context *ctx);
+static void proc_or(cpu_context *ctx);
+static void proc_cp(cpu_context *ctx);
 static void proc_nop(cpu_context *ctx) {};
 static void proc_di(cpu_context *ctx);
 static void proc_ld(cpu_context *ctx);
 static void proc_ldh(cpu_context *ctx);
-static void proc_xor(cpu_context *ctx);
 static void proc_jp(cpu_context *ctx);
 static void proc_jr(cpu_context *ctx);
 static void proc_call(cpu_context *ctx);
@@ -59,8 +63,12 @@ static IN_PROC processors[] =
 	[IN_ADC] = proc_adc,
 	[IN_SUB] = proc_sub,
 	[IN_SBC] = proc_sbc,
+	[IN_AND] = proc_and,
+    [IN_XOR] = proc_xor,
+    [IN_OR] = proc_or,
+    [IN_CP] = proc_cp,
+    [IN_CB] = proc_cb,
     [IN_RETI] = proc_reti,
-    [IN_XOR] = proc_xor
 };
 
 /**
@@ -87,6 +95,179 @@ static void proc_none(cpu_context *ctx)
     printf("INVALID INSTRUCTION!\n");
 #endif
     exit(ERR_INVALID_INSTRUCTION);
+}
+
+/**
+  * @brief  Emulation of CB operators
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_cb(cpu_context *ctx)
+{
+    u8 op = ctx->fetched_data;
+    reg_type reg = decode_reg(op & 0b111);
+    u8 bit = (op >> 3) & 0b111;
+    u8 bit_op = (op >> 6) & 0b11;
+    u8 reg_val = cpu_read_reg8(reg);
+
+    emu_cycles(1);
+
+    if (reg == RT_HL)
+    {
+        emu_cycles(2);
+    }
+
+    /* Switch between BIT, RST, SET (Bitwise operators are manage below) */
+    switch(bit_op)
+    {
+        case 1:		/* BIT (set Z flag if bit selected is 0) */
+            cpu_set_flags(ctx, !(reg_val & (1 << bit)), 0, 1, -1);
+            return;
+
+        case 2:		/* RST (reset bit selected) */
+            reg_val &= ~(1 << bit);
+            cpu_set_reg8(reg, reg_val);
+            return;
+
+        case 3:		/* SET (reset bit selected) */
+            reg_val |= (1 << bit);
+            cpu_set_reg8(reg, reg_val);
+            return;
+    }
+
+    bool flagC = BIT(ctx->regs.f, BIT_C);
+    u8 old = reg_val;
+    
+    /* Switch for 0b00XXXXXX CB OpCode */
+    switch(bit) {
+        case 0:		/* RLC (Rotate Left with Carry)*/
+        	reg_val <<= 1;
+        	reg_val |= (old >> 7);
+
+        	/* Update register */
+        	cpu_set_reg8(reg, reg_val);
+        	/* Update flags */
+        	cpu_set_flags(ctx, reg_val == 0, false, false, BIT(old, 7));
+            return;
+
+        case 1:		/* RRC (Rotate Right with Carry)*/
+            reg_val >>= 1;
+            reg_val |= (old << 7);
+
+            /* Update register */
+            cpu_set_reg8(reg, reg_val);
+            /* Update flags */
+            cpu_set_flags(ctx, !reg_val, false, false, BIT(old, 0));
+            return;
+
+        case 2: 	/* RL (Rotate Left) */
+            reg_val <<= 1;
+            reg_val |= flagC;
+
+            /* Update register */
+            cpu_set_reg8(reg, reg_val);
+            /* Update flags */
+            cpu_set_flags(ctx, !reg_val, false, false, BIT(old, 7));
+            return;
+
+        case 3:		/* RR (Rotate Right) */
+            reg_val >>= 1;
+            reg_val |= (flagC << 7);
+
+            /* Update register */
+            cpu_set_reg8(reg, reg_val);
+            /* Update flags */
+            cpu_set_flags(ctx, !reg_val, false, false, BIT(old, 0));
+            return;
+
+        case 4:		/* SLA (Shift Left Arithmetic)*/
+            reg_val <<= 1;
+
+            /* Update register */
+            cpu_set_reg8(reg, reg_val);
+            /* Update flags */
+            cpu_set_flags(ctx, !reg_val, false, false, BIT(old, 7));
+            return;
+
+        case 5:		/* SRA (Shift Right Arithmetic) */
+        	reg_val = (int8_t)old >> 1;
+            
+        	/* Update register */
+            cpu_set_reg8(reg, reg_val);
+            /* Update flags */
+            cpu_set_flags(ctx, !reg_val, 0, 0, BIT(old, 0));
+            return;
+
+        case 6:		/* SWAP (Swap Nibbles) */
+            reg_val = ((reg_val & 0xF0) >> 4) | ((reg_val & 0xF) << 4);
+            
+            /* Update register */
+            cpu_set_reg8(reg, reg_val);
+            /* Update flags */
+            cpu_set_flags(ctx, reg_val == 0, false, false, false);
+            return;
+
+        case 7:		/* SRL (Shift Right Logic) */
+        	reg_val = old >> 1;
+        	
+        	/* Update register */
+            cpu_set_reg8(reg, reg_val);
+            /* Update flags */
+            cpu_set_flags(ctx, !reg_val, 0, 0, BIT(old, 0));
+            return;
+    }
+
+    fprintf(stderr, "ERROR: INVALID CB: %02X", op);
+    NO_IMPL
+}
+
+/**
+  * @brief  Emulation of AND (and operator between register A and a value/register/memory address)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_and(cpu_context *ctx)
+{
+    ctx->regs.a &= ctx->fetched_data;
+    cpu_set_flags(ctx, ctx->regs.a == 0, 0, 1, 0);
+}
+
+/**
+  * @brief  Emulation of XOR (xor operator between register A and a value/register/memory address)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_xor(cpu_context *ctx)
+{
+    ctx->regs.a ^= ctx->fetched_data & 0xFF;
+    cpu_set_flags(ctx, ctx->regs.a == 0, 0, 0, 0);
+}
+
+/**
+  * @brief  Emulation of OR (or operator between register A and a value/register/memory address)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_or(cpu_context *ctx)
+{
+    ctx->regs.a |= ctx->fetched_data & 0xFF;
+    cpu_set_flags(ctx, ctx->regs.a == 0, 0, 0, 0);
+}
+
+/**
+  * @brief  Emulation of CP (compare between register A and a value/register/memory address)
+  * @param  ctx:		context of the CPU
+  * @retval None
+  */
+static void proc_cp(cpu_context *ctx)
+{
+    int n = (int)ctx->regs.a - (int)ctx->fetched_data;
+
+    cpu_set_flags(ctx, n == 0,
+    		1,
+			((int)ctx->regs.a & 0x0F) - ((int)ctx->fetched_data & 0x0F) < 0,
+			n < 0
+			);
 }
 
 /**
@@ -160,17 +341,6 @@ static void proc_ldh(cpu_context *ctx)
     }
 
     emu_cycles(1);
-}
-
-/**
-  * @brief  Emulation of XOR
-  * @param  ctx:		context of the CPU
-  * @retval None
-  */
-static void proc_xor(cpu_context *ctx)
-{
-    ctx->regs.a ^= ctx->fetched_data & 0xFF;
-    cpu_set_flags(ctx, ctx->regs.a == 0, 0, 0, 0);
 }
 
 /**
