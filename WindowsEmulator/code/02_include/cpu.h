@@ -15,6 +15,8 @@
 #include <instructions.h>
 
 #define	BIT_Z	7
+#define	BIT_N	6
+#define	BIT_H	5
 #define BIT_C	4
 
 typedef struct {

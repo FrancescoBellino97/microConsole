@@ -21,6 +21,7 @@ u8 cpu_get_ie_register();
 void cpu_set_ie_register(u8 val);
 void cpu_set_flags(cpu_context *ctx, char z, char n, char h, char c);
 bool check_cond(cpu_context *ctx);
+bool is_16_bit(reg_type rt);
 
 
 #endif

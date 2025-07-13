@@ -157,3 +157,14 @@ bool check_cond(cpu_context *ctx)
 
     return false;
 }
+
+/**
+  * @brief  Check if the register passed is 16 bit
+  * @param  rt:		register type to check
+  * @retval bool:	true if register is 16 bit, false otherwise
+  */
+bool is_16_bit(reg_type rt)
+{
+	/* From reg type structure order, after RT_AF are 16 bit */
+    return rt >= RT_AF;
+}

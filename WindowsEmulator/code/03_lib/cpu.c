@@ -121,7 +121,7 @@ static void execute()
 static void print_header()
 {
 	printf("\n");
-	printf("PC\t\tINST\t(OP OP+1 OP+2)\tA\tB\tC\tD\tH\tL\tZC\tSP");
+	printf("TICKS\t\tPC\t\tINST\t(OP OP+1 OP+2)\tA\tB\tC\tD\tH\tL\tZNHC\tSP");
 	printf("\n");
 }
 #endif
@@ -135,11 +135,12 @@ static void print_header()
 static void print_instruction(u16 old_pc)
 {
 	printf(
-			"%04X:\t%-7s\t(%02X   %02X   %02X)\t%02X\t%02X\t%02X\t%02X\t%02X\t%02X\t%01X%01X\t%04X\n",
-			old_pc, inst_name(cpu_ctx.cur_inst->type),
+			"%08llX - \t%04X:\t%-7s\t(%02X   %02X   %02X)\t%02X\t%02X\t%02X\t%02X\t%02X\t%02X\t%01X%01X%01X%01X\t%04X\n",
+			emu_get_context()->ticks, old_pc, inst_name(cpu_ctx.cur_inst->type),
 			cpu_ctx.cur_opcode, bus_read(old_pc + 1), bus_read(old_pc + 2),
 			cpu_ctx.regs.a, cpu_ctx.regs.b, cpu_ctx.regs.c, cpu_ctx.regs.d, cpu_ctx.regs.h, cpu_ctx.regs.l,
-			BIT(cpu_ctx.regs.f, BIT_Z), BIT(cpu_ctx.regs.f, BIT_C), cpu_ctx.regs.sp
+			BIT(cpu_ctx.regs.f, BIT_Z), BIT(cpu_ctx.regs.f, BIT_N),BIT(cpu_ctx.regs.f, BIT_H),BIT(cpu_ctx.regs.f, BIT_C),
+			cpu_ctx.regs.sp
 			);
 }
 #endif
