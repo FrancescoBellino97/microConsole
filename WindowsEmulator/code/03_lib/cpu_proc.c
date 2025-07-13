@@ -178,7 +178,7 @@ static void proc_jp(cpu_context *ctx)
   */
 static void proc_jr(cpu_context *ctx)
 {
-    char rel = (char)(ctx->fetched_data & 0xFF);
+    i16 rel = (char)(ctx->fetched_data & 0xFF);
     u16 addr = ctx->regs.pc + rel;
     goto_addr(ctx, addr, false);
 }
