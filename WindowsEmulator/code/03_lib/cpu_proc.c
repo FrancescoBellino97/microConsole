@@ -139,7 +139,8 @@ static void proc_cb(cpu_context *ctx)
     u8 old = reg_val;
     
     /* Switch for 0b00XXXXXX CB OpCode */
-    switch(bit) {
+    switch(bit)
+    {
         case 0:		/* RLC (Rotate Left with Carry)*/
         	reg_val <<= 1;
         	reg_val |= (old >> 7);
