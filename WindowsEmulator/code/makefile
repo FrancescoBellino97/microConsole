@@ -51,6 +51,8 @@ OBJS			:=	$(BUILD_SUPP_DIR)/main.o \
 					$(BUILD_SUPP_DIR)/ppu.o \
 					$(BUILD_SUPP_DIR)/ram.o \
 					$(BUILD_SUPP_DIR)/stack.o \
+					$(BUILD_SUPP_DIR)/interrupts.o \
+					$(BUILD_SUPP_DIR)/ui.o \
 					$(BUILD_SUPP_DIR)/timer.o
 
 DLLS			:=	$(BUILD_DIR)\SDL2.dll \
