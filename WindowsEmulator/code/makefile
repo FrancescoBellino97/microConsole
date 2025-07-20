@@ -30,29 +30,17 @@
 #		BUILD OPTIONS
 PROJECT_NAME	:=	microConsole
 APP_DIR			:=	01_gbemu
-INC_DIR			:=	02_include
-LIB_DIR			:=	03_lib
-BUILD_DIR		:=	05_build
+INC_DIR			:=	$(APP_DIR)
+BUILD_DIR		:=	06_build
 BUILD_SUPP_DIR	:=	$(BUILD_DIR)/code
 
-SDL_PATH        :=    04_sdl\sdl2\lib\x64
-SDL_TTF_PATH    :=    04_sdl\sdl2_ttf\lib\x64
+SDL_PATH        :=    05_sdl\sdl2\lib\x64
+SDL_TTF_PATH    :=    05_sdl\sdl2_ttf\lib\x64
 
 #		FILES
 OBJS			:=	$(BUILD_SUPP_DIR)/main.o \
-					$(BUILD_SUPP_DIR)/bus.o \
-					$(BUILD_SUPP_DIR)/cart.o \
-					$(BUILD_SUPP_DIR)/cpu_proc.o \
-					$(BUILD_SUPP_DIR)/cpu_util.o \
-					$(BUILD_SUPP_DIR)/cpu_fetch.o \
-					$(BUILD_SUPP_DIR)/cpu.o \
 					$(BUILD_SUPP_DIR)/emu.o \
-					$(BUILD_SUPP_DIR)/instructions.o \
-					$(BUILD_SUPP_DIR)/ppu.o \
-					$(BUILD_SUPP_DIR)/ram.o \
-					$(BUILD_SUPP_DIR)/stack.o \
-					$(BUILD_SUPP_DIR)/timer.o
-
+					
 DLLS			:=	$(BUILD_DIR)\SDL2.dll \
 					$(BUILD_DIR)\SDL2_ttf.dll \
 					$(BUILD_DIR)\libfreetype-6.dll
@@ -92,6 +80,7 @@ cleanall:	#Delete directory recursively (/S) and without confirm (/Q)
 mem_usage: $(BUILD_DIR)/$(PROJECT_NAME).exe $(BUILD_DIR)/$(PROJECT_NAME).hdr
 	@$(MEM_USAGE) $(BUILD_DIR)/$(PROJECT_NAME).hdr
 
+
 #		BUILD PROCESS
 $(BUILD_DIR)/$(PROJECT_NAME).exe: $(OBJS)
 	@$(CC) $(CFLAGS) $(CPPFLAGS) $^ $(DLLFLAGS) -o $@ -Wl,-Map="$(BUILD_DIR)/$(PROJECT_NAME).map"
@@ -108,7 +97,8 @@ $(BUILD_DIR)/memory_usage.txt: $(BUILD_DIR)/$(PROJECT_NAME).hdr
 	@$(MEM_USAGE) $^ > $@
 	@$(MEM_USAGE) $^
 
-#		MAIN
+
+#		MAIN APPLICATION
 $(BUILD_SUPP_DIR)/%.o: $(APP_DIR)/%.c 
 	@$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< $(DLLFLAGS) -o $@
 	@echo Compiling $<

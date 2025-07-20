@@ -7,21 +7,26 @@
  ******************************************************************************
  */
 
-#include "main.h"
 #include "emu.h"
 
+
 /**
-  * @brief  Main app that call the emulation function
+  * @brief  TODO add description
+  * @param  None
+  * @retval uint8_t:	0 if no errors, -1 otherwise
+  */
+uint8_t emu_init()
+{
+	return NO_ERRORS;
+}
+
+/**
+  * @brief  TODO add description
   * @param  argc:		number of arguments passed
   * 		**argv:		pointer to the arguments passed
-  * @retval int:		0 if no error, otherwise the code error
+  * @retval uint8_t:	0 if no errors, -1 otherwise
   */
-int main(int argc, char **argv)
+uint8_t emu_run(int argc, char **argv)
 {
-	if(emu_init() != NO_ERRORS)
-	{
-		return INIT_ERROR;
-	}
-
-	return (int)emu_run(argc, argv);
+	return NO_ERRORS;
 }
