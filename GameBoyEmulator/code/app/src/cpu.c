@@ -2,6 +2,7 @@
 #include <bus.h>
 #include <emu.h>
 #include <interrupts.h>
+#include <dbg.h>
 
 cpu_context ctx = {0};
 
@@ -44,9 +45,12 @@ bool cpu_step() {
             ctx.regs.f & (1 << 4) ? 'C' : '-'
         );
 
-        printf("%08llX - %04X: %-7s (%02X %02X %02X) A: %02X F: %s BC: %02X%02X DE: %02X%02X HL: %02X%02X\n",
+        char inst[16];
+        inst_to_str(&ctx, inst);
+
+        printf("%08llX - %04X: %-12s (%02X %02X %02X) A: %02X F: %s BC: %02X%02X DE: %02X%02X HL: %02X%02X\n", 
             emu_get_context()->ticks,
-            pc, inst_name(ctx.cur_inst->type), ctx.cur_opcode,
+            pc, inst, ctx.cur_opcode,
             bus_read(pc + 1), bus_read(pc + 2), ctx.regs.a, flags, ctx.regs.b, ctx.regs.c,
             ctx.regs.d, ctx.regs.e, ctx.regs.h, ctx.regs.l);
 
@@ -54,6 +58,9 @@ bool cpu_step() {
             printf("Unknown Instruction! %02X\n", ctx.cur_opcode);
             exit(-7);
         }
+
+        dbg_update();
+        dbg_print();
 
         execute();
     } else {
