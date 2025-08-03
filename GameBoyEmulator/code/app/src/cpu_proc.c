@@ -24,13 +24,12 @@ void cpu_set_flags(cpu_context *ctx, int8_t z, int8_t n, int8_t h, int8_t c) {
 }
 
 static void proc_none(cpu_context *ctx) {
-	(void) ctx;
     printf("INVALID INSTRUCTION!\n");
     exit(-7);
 }
 
 static void proc_nop(cpu_context *ctx) {
-	(void) ctx;
+
 }
 
 reg_type rt_lookup[] = {
@@ -195,7 +194,6 @@ static void proc_rla(cpu_context *ctx) {
 }
 
 static void proc_stop(cpu_context *ctx) {
-	(void) ctx;
     fprintf(stderr, "STOPPING!\n");
     NO_IMPL
 }

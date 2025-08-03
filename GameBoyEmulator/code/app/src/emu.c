@@ -27,8 +27,7 @@ emu_context *emu_get_context() {
 }
 
 void *cpu_run(void *p) {
-	(void) p;
-	timer_init();
+    timer_init();
     cpu_init();
 
     ctx.running = true;
@@ -45,8 +44,6 @@ void *cpu_run(void *p) {
             printf("CPU Stopped\n");
             return 0;
         }
-
-        ctx.ticks++;
     }
 
     return 0;
