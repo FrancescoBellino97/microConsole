@@ -63,6 +63,7 @@ OBJS 			:= 	$(BUILD_SUPP_DIR)/main.o \
 					$(BUILD_SUPP_DIR)/ui.o \
 					$(BUILD_SUPP_DIR)/bus.o \
 					$(BUILD_SUPP_DIR)/io.o \
+					$(BUILD_SUPP_DIR)/dma.o \
 					$(BUILD_SUPP_DIR)/dbg.o 
 
 # Include directories list (depend on target)
