@@ -1,6 +1,6 @@
 #include <instructions.h>
 #include <cpu.h>
-
+#include <bus.h>
 
 instruction instructions[0x100] = {
     [0x00] = {IN_NOP, AM_IMP},
@@ -426,8 +426,7 @@ void inst_to_str(cpu_context *ctx, char *str) {
 
         case AM_A8_R:
             sprintf(str, "%s $%02X,%s", inst_name(inst->type), 
-                //bus_read(ctx->regs.pc - 1), rt_lookup[inst->reg_2]);	Why is bus read??
-            	ctx->fetched_data & 0xFF, rt_lookup[inst->reg_2]);
+                bus_read(ctx->regs.pc - 1), rt_lookup[inst->reg_2]);
 
             return;
 

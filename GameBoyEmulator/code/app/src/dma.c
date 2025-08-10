@@ -1,7 +1,6 @@
 #include <dma.h>
 #include <ppu.h>
 #include <bus.h>
-#include <unistd.h>
 
 typedef struct {
     bool active;
@@ -34,11 +33,6 @@ void dma_tick() {
     ctx.byte++;
 
     ctx.active = ctx.byte < 0xA0;
-
-    if (!ctx.active) {
-        printf("DMA DONE!\n");
-        sleep(2);
-    }
 }
 
 bool dma_transferring() {
